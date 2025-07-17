@@ -33,7 +33,7 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Runtime Environment Configurations" href="runtime_configs.html" />
+    <link rel="next" title="Reading Explain Plans" href="explain-usage.html" />
     <link rel="prev" title="Prepared Statements" href="sql/prepared_statements.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en">
@@ -295,11 +295,6 @@
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="runtime_configs.html">
-   Runtime Environment Configurations
-  </a>
- </li>
- <li class="toctree-l1">
   <a class="reference internal" href="explain-usage.html">
    Reading Explain Plans
   </a>
@@ -319,6 +314,11 @@
  <li class="toctree-l1">
   <a class="reference internal" href="../library-user-guide/index.html">
    Introduction
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../library-user-guide/upgrading.html">
+   Upgrade Guides
   </a>
  </li>
  <li class="toctree-l1">
@@ -357,14 +357,36 @@
    Catalogs, Schemas, and Tables
   </a>
  </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../library-user-guide/adding-udfs.html">
-   Adding User Defined Functions: Scalar/Window/Aggregate/Table Functions
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../library-user-guide/functions/index.html">
+   Functions
   </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label for="toctree-checkbox-3">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../library-user-guide/functions/adding-udfs.html">
+     Adding User Defined Functions: Scalar/Window/Aggregate/Table Functions
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../library-user-guide/functions/spark.html">
+     Spark Compatible Functions
+    </a>
+   </li>
+  </ul>
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="../library-user-guide/custom-table-providers.html">
    Custom Table Provider
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../library-user-guide/table-constraints.html">
+   Table Constraint Enforcement
   </a>
  </li>
  <li class="toctree-l1">
@@ -380,11 +402,6 @@
  <li class="toctree-l1">
   <a class="reference internal" href="../library-user-guide/query-optimizer.html">
    DataFusion Query Optimizer
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../library-user-guide/upgrading.html">
-   Upgrade Guides
   </a>
  </li>
 </ul>
@@ -448,8 +465,8 @@
   <a class="reference internal" href="../contributor-guide/specification/index.html">
    Specifications
   </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
-  <label for="toctree-checkbox-3">
+  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+  <label for="toctree-checkbox-4">
    <i class="fas fa-chevron-down">
    </i>
   </label>
@@ -521,9 +538,24 @@
               
               <div class="toc-item">
                 
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
 
 <nav id="bd-toc-nav">
-    
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#">
+   Configuration Settings
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#runtime-configuration-settings">
+   Runtime Configuration Settings
+  </a>
+ </li>
+</ul>
+
 </nav>
               </div>
               
@@ -632,8 +664,8 @@ Environment variables are read during <code class="docutils literal notranslate"
 <td><p>When set to true, record batches will be examined between each operator and small batches will be coalesced into larger batches. This is helpful when there are highly selective filters or joins that could produce tiny output batches. The target batch size is determined by the configuration setting</p></td>
 </tr>
 <tr class="row-even"><td><p>datafusion.execution.collect_statistics</p></td>
-<td><p>false</p></td>
-<td><p>Should DataFusion collect statistics when first creating a table. Has no effect after the table is created. Applies to the default <code class="docutils literal notranslate"><span class="pre">ListingTableProvider</span></code> in DataFusion. Defaults to false.</p></td>
+<td><p>true</p></td>
+<td><p>Should DataFusion collect statistics when first creating a table. Has no effect after the table is created. Applies to the default <code class="docutils literal notranslate"><span class="pre">ListingTableProvider</span></code> in DataFusion. Defaults to true.</p></td>
 </tr>
 <tr class="row-odd"><td><p>datafusion.execution.target_partitions</p></td>
 <td><p>0</p></td>
@@ -724,7 +756,7 @@ Environment variables are read during <code class="docutils literal notranslate"
 <td><p>(writing) Target maximum number of rows in each row group (defaults to 1M rows). Writing larger row groups requires more memory to write, but can get better compression and be faster to read.</p></td>
 </tr>
 <tr class="row-odd"><td><p>datafusion.execution.parquet.created_by</p></td>
-<td><p>datafusion version 47.0.0</p></td>
+<td><p>datafusion version 48.0.0</p></td>
 <td><p>(writing) Sets “created by” property</p></td>
 </tr>
 <tr class="row-even"><td><p>datafusion.execution.parquet.column_index_truncate_length</p></td>
@@ -775,77 +807,85 @@ Environment variables are read during <code class="docutils literal notranslate"
 <td><p>false</p></td>
 <td><p>When set to true, skips verifying that the schema produced by planning the input of <code class="docutils literal notranslate"><span class="pre">LogicalPlan::Aggregate</span></code> exactly matches the schema of the input plan. When set to false, if the schema does not match exactly (including nullability and metadata), a planning error will be raised. This is used to workaround bugs in the planner that are now caught by the new schema verification step.</p></td>
 </tr>
-<tr class="row-even"><td><p>datafusion.execution.sort_spill_reservation_bytes</p></td>
+<tr class="row-even"><td><p>datafusion.execution.spill_compression</p></td>
+<td><p>uncompressed</p></td>
+<td><p>Sets the compression codec used when spilling data to disk. Since datafusion writes spill files using the Arrow IPC Stream format, only codecs supported by the Arrow IPC Stream Writer are allowed. Valid values are: uncompressed, lz4_frame, zstd. Note: lz4_frame offers faster (de)compression, but typically results in larger spill files. In contrast, zstd achieves higher compression ratios at the cost of slower (de)compression speed.</p></td>
+</tr>
+<tr class="row-odd"><td><p>datafusion.execution.sort_spill_reservation_bytes</p></td>
 <td><p>10485760</p></td>
 <td><p>Specifies the reserved memory for each spillable sort operation to facilitate an in-memory merge. When a sort operation spills to disk, the in-memory data must be sorted and merged before being written to a file. This setting reserves a specific amount of memory for that in-memory sort/merge process. Note: This setting is irrelevant if the sort operation cannot spill (i.e., if there’s no <code class="docutils literal notranslate"><span class="pre">DiskManager</span></code> configured).</p></td>
 </tr>
-<tr class="row-odd"><td><p>datafusion.execution.sort_in_place_threshold_bytes</p></td>
+<tr class="row-even"><td><p>datafusion.execution.sort_in_place_threshold_bytes</p></td>
 <td><p>1048576</p></td>
 <td><p>When sorting, below what size should data be concatenated and sorted in a single RecordBatch rather than sorted in batches and merged.</p></td>
 </tr>
-<tr class="row-even"><td><p>datafusion.execution.meta_fetch_concurrency</p></td>
+<tr class="row-odd"><td><p>datafusion.execution.meta_fetch_concurrency</p></td>
 <td><p>32</p></td>
 <td><p>Number of files to read in parallel when inferring schema and statistics</p></td>
 </tr>
-<tr class="row-odd"><td><p>datafusion.execution.minimum_parallel_output_files</p></td>
+<tr class="row-even"><td><p>datafusion.execution.minimum_parallel_output_files</p></td>
 <td><p>4</p></td>
 <td><p>Guarantees a minimum level of output files running in parallel. RecordBatches will be distributed in round robin fashion to each parallel writer. Each writer is closed and a new file opened once soft_max_rows_per_output_file is reached.</p></td>
 </tr>
-<tr class="row-even"><td><p>datafusion.execution.soft_max_rows_per_output_file</p></td>
+<tr class="row-odd"><td><p>datafusion.execution.soft_max_rows_per_output_file</p></td>
 <td><p>50000000</p></td>
 <td><p>Target number of rows in output files when writing multiple. This is a soft max, so it can be exceeded slightly. There also will be one file smaller than the limit if the total number of rows written is not roughly divisible by the soft max</p></td>
 </tr>
-<tr class="row-odd"><td><p>datafusion.execution.max_buffered_batches_per_output_file</p></td>
+<tr class="row-even"><td><p>datafusion.execution.max_buffered_batches_per_output_file</p></td>
 <td><p>2</p></td>
 <td><p>This is the maximum number of RecordBatches buffered for each output file being worked. Higher values can potentially give faster write performance at the cost of higher peak memory consumption</p></td>
 </tr>
-<tr class="row-even"><td><p>datafusion.execution.listing_table_ignore_subdirectory</p></td>
+<tr class="row-odd"><td><p>datafusion.execution.listing_table_ignore_subdirectory</p></td>
 <td><p>true</p></td>
 <td><p>Should sub directories be ignored when scanning directories for data files. Defaults to true (ignores subdirectories), consistent with Hive. Note that this setting does not affect reading partitioned tables (e.g. <code class="docutils literal notranslate"><span class="pre">/table/year=2021/month=01/data.parquet</span></code>).</p></td>
 </tr>
-<tr class="row-odd"><td><p>datafusion.execution.enable_recursive_ctes</p></td>
+<tr class="row-even"><td><p>datafusion.execution.enable_recursive_ctes</p></td>
 <td><p>true</p></td>
 <td><p>Should DataFusion support recursive CTEs</p></td>
 </tr>
-<tr class="row-even"><td><p>datafusion.execution.split_file_groups_by_statistics</p></td>
+<tr class="row-odd"><td><p>datafusion.execution.split_file_groups_by_statistics</p></td>
 <td><p>false</p></td>
 <td><p>Attempt to eliminate sorts by packing &amp; sorting files with non-overlapping statistics into the same file groups. Currently experimental</p></td>
 </tr>
-<tr class="row-odd"><td><p>datafusion.execution.keep_partition_by_columns</p></td>
+<tr class="row-even"><td><p>datafusion.execution.keep_partition_by_columns</p></td>
 <td><p>false</p></td>
 <td><p>Should DataFusion keep the columns used for partition_by in the output RecordBatches</p></td>
 </tr>
-<tr class="row-even"><td><p>datafusion.execution.skip_partial_aggregation_probe_ratio_threshold</p></td>
+<tr class="row-odd"><td><p>datafusion.execution.skip_partial_aggregation_probe_ratio_threshold</p></td>
 <td><p>0.8</p></td>
 <td><p>Aggregation ratio (number of distinct groups / number of input rows) threshold for skipping partial aggregation. If the value is greater then partial aggregation will skip aggregation for further input</p></td>
 </tr>
-<tr class="row-odd"><td><p>datafusion.execution.skip_partial_aggregation_probe_rows_threshold</p></td>
+<tr class="row-even"><td><p>datafusion.execution.skip_partial_aggregation_probe_rows_threshold</p></td>
 <td><p>100000</p></td>
 <td><p>Number of input rows partial aggregation partition should process, before aggregation ratio check and trying to switch to skipping aggregation mode</p></td>
 </tr>
-<tr class="row-even"><td><p>datafusion.execution.use_row_number_estimates_to_optimize_partitioning</p></td>
+<tr class="row-odd"><td><p>datafusion.execution.use_row_number_estimates_to_optimize_partitioning</p></td>
 <td><p>false</p></td>
 <td><p>Should DataFusion use row number estimates at the input to decide whether increasing parallelism is beneficial or not. By default, only exact row numbers (not estimates) are used for this decision. Setting this flag to <code class="docutils literal notranslate"><span class="pre">true</span></code> will likely produce better plans. if the source of statistics is accurate. We plan to make this the default in the future.</p></td>
 </tr>
-<tr class="row-odd"><td><p>datafusion.execution.enforce_batch_size_in_joins</p></td>
+<tr class="row-even"><td><p>datafusion.execution.enforce_batch_size_in_joins</p></td>
 <td><p>false</p></td>
 <td><p>Should DataFusion enforce batch size in joins or not. By default, DataFusion will not enforce batch size in joins. Enforcing batch size in joins can reduce memory usage when joining large tables with a highly-selective join filter, but is also slightly slower.</p></td>
 </tr>
-<tr class="row-even"><td><p>datafusion.execution.objectstore_writer_buffer_size</p></td>
+<tr class="row-odd"><td><p>datafusion.execution.objectstore_writer_buffer_size</p></td>
 <td><p>10485760</p></td>
 <td><p>Size (bytes) of data buffer DataFusion uses when writing output files. This affects the size of the data chunks that are uploaded to remote object stores (e.g. AWS S3). If very large (&gt;= 100 GiB) output files are being written, it may be necessary to increase this size to avoid errors from the remote end point.</p></td>
 </tr>
-<tr class="row-odd"><td><p>datafusion.optimizer.enable_distinct_aggregation_soft_limit</p></td>
+<tr class="row-even"><td><p>datafusion.optimizer.enable_distinct_aggregation_soft_limit</p></td>
 <td><p>true</p></td>
 <td><p>When set to true, the optimizer will push a limit operation into grouped aggregations which have no aggregate expressions, as a soft limit, emitting groups once the limit is reached, before all rows in the group are read.</p></td>
 </tr>
-<tr class="row-even"><td><p>datafusion.optimizer.enable_round_robin_repartition</p></td>
+<tr class="row-odd"><td><p>datafusion.optimizer.enable_round_robin_repartition</p></td>
 <td><p>true</p></td>
 <td><p>When set to true, the physical plan optimizer will try to add round robin repartitioning to increase parallelism to leverage more CPU cores</p></td>
 </tr>
-<tr class="row-odd"><td><p>datafusion.optimizer.enable_topk_aggregation</p></td>
+<tr class="row-even"><td><p>datafusion.optimizer.enable_topk_aggregation</p></td>
 <td><p>true</p></td>
 <td><p>When set to true, the optimizer will attempt to perform limit operations during aggregations, if possible</p></td>
+</tr>
+<tr class="row-odd"><td><p>datafusion.optimizer.enable_dynamic_filter_pushdown</p></td>
+<td><p>true</p></td>
+<td><p>When set to true attempts to push down dynamic filters generated by operators into the file scan phase. For example, for a query such as <code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">*</span> <span class="pre">FROM</span> <span class="pre">t</span> <span class="pre">ORDER</span> <span class="pre">BY</span> <span class="pre">timestamp</span> <span class="pre">DESC</span> <span class="pre">LIMIT</span> <span class="pre">10</span></code>, the optimizer will attempt to push down the current top 10 timestamps that the TopK operator references into the file scans. This means that if we already have 10 timestamps in the year 2025 any files that only have timestamps in the year 2024 can be skipped / pruned at various stages in the scan.</p></td>
 </tr>
 <tr class="row-even"><td><p>datafusion.optimizer.filter_null_join_keys</p></td>
 <td><p>false</p></td>
@@ -963,9 +1003,9 @@ Environment variables are read during <code class="docutils literal notranslate"
 <td><p>true</p></td>
 <td><p>If true, permit lengths for <code class="docutils literal notranslate"><span class="pre">VARCHAR</span></code> such as <code class="docutils literal notranslate"><span class="pre">VARCHAR(20)</span></code>, but ignore the length. If false, error if a <code class="docutils literal notranslate"><span class="pre">VARCHAR</span></code> with a length is specified. The Arrow type system does not have a notion of maximum string length and thus DataFusion can not enforce such limits.</p></td>
 </tr>
-<tr class="row-odd"><td><p>datafusion.sql_parser.map_varchar_to_utf8view</p></td>
-<td><p>false</p></td>
-<td><p>If true, <code class="docutils literal notranslate"><span class="pre">VARCHAR</span></code> is mapped to <code class="docutils literal notranslate"><span class="pre">Utf8View</span></code> during SQL planning. If false, <code class="docutils literal notranslate"><span class="pre">VARCHAR</span></code> is mapped to <code class="docutils literal notranslate"><span class="pre">Utf8</span></code> during SQL planning. Default is false.</p></td>
+<tr class="row-odd"><td><p>datafusion.sql_parser.map_string_types_to_utf8view</p></td>
+<td><p>true</p></td>
+<td><p>If true, string types (VARCHAR, CHAR, Text, and String) are mapped to <code class="docutils literal notranslate"><span class="pre">Utf8View</span></code> during SQL planning. If false, they are mapped to <code class="docutils literal notranslate"><span class="pre">Utf8</span></code>. Default is true.</p></td>
 </tr>
 <tr class="row-even"><td><p>datafusion.sql_parser.collect_spans</p></td>
 <td><p>false</p></td>
@@ -1014,6 +1054,29 @@ Environment variables are read during <code class="docutils literal notranslate"
 </tbody>
 </table>
 </section>
+<section id="runtime-configuration-settings">
+<h1>Runtime Configuration Settings<a class="headerlink" href="#runtime-configuration-settings" title="Link to this heading">¶</a></h1>
+<p>DataFusion runtime configurations can be set via SQL using the <code class="docutils literal notranslate"><span class="pre">SET</span></code> command.</p>
+<p>For example, to configure <code class="docutils literal notranslate"><span class="pre">datafusion.runtime.memory_limit</span></code>:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">SET</span><span class="w"> </span><span class="n">datafusion</span><span class="p">.</span><span class="n">runtime</span><span class="p">.</span><span class="n">memory_limit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;2G&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The following runtime configuration settings are available:</p>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>key</p></th>
+<th class="head"><p>default</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>datafusion.runtime.memory_limit</p></td>
+<td><p>NULL</p></td>
+<td><p>Maximum memory limit for query execution. Supports suffixes K (kilobytes), M (megabytes), and G (gigabytes). Example: ‘2G’ for 2 gigabytes.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 
 
               </div>
@@ -1028,10 +1091,10 @@ Environment variables are read during <code class="docutils literal notranslate"
             <p class="prev-next-title">Prepared Statements</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="runtime_configs.html" title="next page">
+    <a class='right-next' id="next-link" href="explain-usage.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Runtime Environment Configurations</p>
+        <p class="prev-next-title">Reading Explain Plans</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
